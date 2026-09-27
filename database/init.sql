@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS product_batch (
   quantity TEXT,
   material_lot_no TEXT,
   produced_at TEXT,
+  -- IN_PROGRESS 在制待检 / PENDING_HANDLING 待处理（留样登记被拦截）/ RELEASED 已放行（留样登记成功）
   batch_status TEXT
 );
 
@@ -50,6 +51,32 @@ CREATE TABLE IF NOT EXISTS defect_record (
   disposition_status TEXT
 );
 
+-- 留存样品（留样）：随终检提交登记，登记成功后批次才转为已放行
+CREATE TABLE IF NOT EXISTS retained_sample (
+  id INTEGER PRIMARY KEY,
+  sample_code TEXT UNIQUE,
+  batch_id TEXT,
+  batch_no TEXT,
+  location_code TEXT,
+  retention_expiry TEXT,
+  registered_at TEXT,
+  registered_by TEXT,
+  -- RETAINED 封存中（占用柜位）/ DESTROYED 已销毁（柜位释放）
+  status TEXT,
+  destroyed_at TEXT,
+  destroyed_by TEXT
+);
+
+-- 留样历次处置：REGISTERED 留样登记 / DESTROYED 到期销毁（质量经理登记）
+CREATE TABLE IF NOT EXISTS sample_disposition (
+  id INTEGER PRIMARY KEY,
+  sample_code TEXT,
+  action TEXT,
+  operator_id TEXT,
+  occurred_at TEXT,
+  remark TEXT
+);
+
 CREATE TABLE IF NOT EXISTS audit_log (
   id INTEGER PRIMARY KEY,
   actor TEXT,
@@ -58,3 +85,8 @@ CREATE TABLE IF NOT EXISTS audit_log (
   target_id TEXT,
   created_at TEXT
 );
+
+-- 柜位互斥：仅封存中的留样占用柜位，已销毁的柜位可复用
+CREATE UNIQUE INDEX IF NOT EXISTS ux_retained_sample_active_location
+  ON retained_sample (location_code)
+  WHERE status = 'RETAINED';
