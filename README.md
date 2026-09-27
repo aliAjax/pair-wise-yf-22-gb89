@@ -14,6 +14,21 @@ cp .env.example .env && docker compose up -d
 
 后端健康检查：<http://localhost:21114/health>
 
+### 留样与放行流程 API
+
+- `POST /api/quality-inspection/final` 提交终检并登记留样（样品编号、柜位、留样到期日）；柜位已占用或到期日早于检验日期时批次保留待处理，留样登记成功后批次才转为已放行：
+
+```bash
+curl -X POST http://localhost:21114/api/quality-inspection/final \
+  -H 'Content-Type: application/json' -H 'X-Operator: inspector01' \
+  -d '{"batchId":"1","inspectionType":"FINAL","resultStatus":"PASS","inspectedAt":"2026-09-27","sampleNo":"RS-2026-0002","cabinetSlot":"A-02","retainUntil":"2026-12-31"}'
+```
+
+- `GET /api/retention-sample` 留样清单
+- `GET /api/retention-sample/trace/{batchNo}` 追溯查询（样品编号、柜位、状态、历次处置）
+- `POST /api/retention-sample/{id}/destroy` 到期后由质量经理登记销毁（请求头 `X-Role: QUALITY_MANAGER`），未到期不能销毁
+- 原有清单（`/api/product-batch`、`/api/quality-inspection` 等）照常可用
+
 
 ## 本地开发方式
 
@@ -57,6 +72,9 @@ backend/src/routes, controllers, services, models, repositories, middlewares, co
 - WorkOrderStatus: constants/WorkOrderStatus、types/WorkOrderStatus、constructors、logTemplates、errorMessages、筛选器、展示组件/控制器均有引用。
 - InspectionResultStatus: constants/InspectionResultStatus、types/InspectionResultStatus、constructors、logTemplates、errorMessages、筛选器、展示组件/控制器均有引用。
 - DefectSeverity: constants/DefectSeverity、types/DefectSeverity、constructors、logTemplates、errorMessages、筛选器、展示组件/控制器均有引用。
+- RetentionSampleStatus（STORED/DESTROYED）: constants/RetentionSampleStatus、models/RetentionSample、repositories/RetentionSampleRepository、services/RetentionSampleService、constructors/RetentionSampleDtoFactory、utils/Formatters（状态文案）均有引用。
+- BatchStatus（PENDING/RELEASED）: constants/BatchStatus、repositories/ProductBatchRepository、services/ProductBatchService、services/QualityInspectionService 均有引用。
+- InspectionType（FIRST/PATROL/FINAL）: constants/InspectionType、services/QualityInspectionService 均有引用。
 
 ## 为什么会牵一发动全身
 

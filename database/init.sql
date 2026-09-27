@@ -50,6 +50,26 @@ CREATE TABLE IF NOT EXISTS defect_record (
   disposition_status TEXT
 );
 
+CREATE TABLE IF NOT EXISTS retention_sample (
+  id INTEGER PRIMARY KEY,
+  sample_no TEXT,
+  batch_id TEXT,
+  cabinet_slot TEXT,
+  retain_until TEXT,
+  status TEXT,
+  destroyed_by TEXT,
+  destroyed_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS retention_sample_event (
+  id INTEGER PRIMARY KEY,
+  sample_id TEXT,
+  action TEXT,
+  operator TEXT,
+  detail TEXT,
+  created_at TEXT
+);
+
 CREATE TABLE IF NOT EXISTS audit_log (
   id INTEGER PRIMARY KEY,
   actor TEXT,

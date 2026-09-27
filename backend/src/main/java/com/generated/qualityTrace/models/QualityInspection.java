@@ -1,1 +1,1 @@
-package com.generated.qualityTrace.models; public class QualityInspection { public Long id; public String name; public String status; }
+package com.generated.qualityTrace.models; public class QualityInspection { public Long id; public String name; public String status; public Long batchId; public String inspectionType; public String resultStatus; public String inspectedAt; }

@@ -1,1 +1,1 @@
-package com.generated.qualityTrace.types; public record QualityInspectionPayload(String payload) {}
+package com.generated.qualityTrace.types; public record QualityInspectionPayload(String batchId, String inspectionType, String resultStatus, String inspectedAt, String sampleNo, String cabinetSlot, String retainUntil) {}

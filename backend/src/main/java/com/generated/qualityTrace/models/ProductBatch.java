@@ -1,1 +1,1 @@
-package com.generated.qualityTrace.models; public class ProductBatch { public Long id; public String name; public String status; }
+package com.generated.qualityTrace.models; public class ProductBatch { public Long id; public String name; public String status; public String batchNo; }
